@@ -7,7 +7,7 @@ spring:
     # 我的本地安装了两个版本的mysql，对应不同的端口，这里使用8.0版本的mysql
     url: jdbc:mysql://localhost:13306/seckill?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password: Qw408465
+    password:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       #初始化大小
