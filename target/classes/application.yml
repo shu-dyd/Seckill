@@ -1,0 +1,52 @@
+spring:
+  thymeleaf:
+    cache: false
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 我的本地安装了两个版本的mysql，对应不同的端口，这里使用8.0版本的mysql
+    url: jdbc:mysql://localhost:13306/seckill?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: Qw408465
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      #初始化大小
+      initial-size: 8
+      #连接池最小值
+      min-idle: 8
+      #连接池最大值
+      max-active: 12
+      #配置获取连接等待超时的时间(单位：毫秒)
+      max-wait: 60000
+      #配置间隔多久才进行一次检测，检测需要关闭的空闲连接(单位：毫秒)
+      time-between-eviction-runs-millis: 2000
+      #配置一个连接在池中（含空闲）最小生存的时间(单位：毫秒)
+      min-evictable-idle-time-millis: 60000
+      #配置一个连接在池中空闲最大生存的时间(单位：毫秒)
+      max-evictable-idle-time-millis: 90000
+      #检测连接是否有效的测试语句
+      validation-query: select 1
+      #申请连接时执行validationQuery检测连接是否有效。此配置会造成一定性能降低
+      test-on-borrow: false
+      #申请连接的时候，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效
+      test-while-idle: true
+      #归还连接时执行validationQuery检测连接是否有效。此配置会造成一定性能降低
+      test-on-return: false
+      #打开后，增强timeBetweenEvictionRunsMillis的周期性连接检查，minIdle内的空闲连接，每次检查强制验证连接有效性. 参考：https://github.com/alibaba/druid/wiki/KeepAlive_cn
+      keep-alive: true
+      #是否缓存preparedStatement（也就是PSCache），PSCache对支持游标的数据库性能提升巨大，如：oracle，在mysql下建议关闭。具体查阅PSCache相关资料
+      pool-prepared-statements: false
+      #配置提交方式（默认值：true）
+      default-auto-commit: true
+
+      #连接泄露检查，打开removeAbandoned功能 , 连接从连接池借出后，长时间不归还，将触发强制回连接。回收周期随timeBetweenEvictionRunsMillis进行，如果连接为从连接池借出状态，并且未执行任何sql，并且从借出时间起已超过removeAbandonedTimeout时间，则强制归还连接到连接池中
+      remove-abandoned: true
+      #检查连接泄露依据（超时时间）
+      remove-abandoned-timeout-millis: 300000
+      #abanded连接时输出错误日志，方便出现连接泄露时可以通过错误日志定位忘记关闭连接的位置
+      log-abandoned: true
+
+
+
+
+
