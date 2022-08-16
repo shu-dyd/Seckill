@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+
 @Controller()
 @RequestMapping("/login")
 @Slf4j
@@ -24,7 +26,7 @@ public class LoginController {
 
     @ResponseBody
     @RequestMapping("/doLogin")
-    public RespBean doLogin(LoginVo loginVo){
+    public RespBean doLogin(@Valid LoginVo loginVo){
         return userService.doLogin(loginVo);
     }
 
