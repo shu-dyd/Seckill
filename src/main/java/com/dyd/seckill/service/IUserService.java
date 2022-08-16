@@ -2,6 +2,8 @@ package com.dyd.seckill.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.dyd.seckill.pojo.User;
+import com.dyd.seckill.vo.LoginVo;
+import com.dyd.seckill.vo.RespBean;
 
 /**
  * <p>
@@ -13,4 +15,5 @@ import com.dyd.seckill.pojo.User;
  */
 public interface IUserService extends IService<User> {
 
+    RespBean doLogin(LoginVo loginVo);
 }

@@ -37,10 +37,11 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!--    注意版本太低的话可能会导致datatime字段的转换出现问题    -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.17</version>
+            <version>1.2.6</version>
         </dependency>
 
         <dependency>

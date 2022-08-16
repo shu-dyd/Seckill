@@ -17,9 +17,11 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("t_user")
-public class User{
+public class User {
 
     private static final long serialVersionUID = 1L;
+
+    private Long id;
 
     private String nickname;
 
