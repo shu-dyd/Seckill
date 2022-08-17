@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -17,8 +18,9 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("t_user")
-public class User {
-
+public class User implements Serializable {
+    // spring session作为分布式session的解决方案。
+    // session中setAttribute,键是uuid作为的cookie,值是user对象
     private static final long serialVersionUID = 1L;
 
     private Long id;

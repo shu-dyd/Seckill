@@ -5,15 +5,17 @@ import com.dyd.seckill.exception.GlobalException;
 import com.dyd.seckill.mapper.UserMapper;
 import com.dyd.seckill.pojo.User;
 import com.dyd.seckill.service.IUserService;
+import com.dyd.seckill.utils.CookieUtil;
 import com.dyd.seckill.utils.MD5Utils;
-import com.dyd.seckill.utils.ValidateUtil;
+import com.dyd.seckill.utils.UUIDUtil;
 import com.dyd.seckill.vo.LoginVo;
 import com.dyd.seckill.vo.RespBean;
 import com.dyd.seckill.vo.RespBeanEnum;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * <p>
@@ -37,10 +39,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * 需要自定义一个异常
      *
      * @param loginVo
+     * @param request
+     * @param response
      * @return
      */
     @Override
-    public RespBean doLogin(LoginVo loginVo) {
+    public RespBean doLogin(LoginVo loginVo, HttpServletRequest request, HttpServletResponse response) {
         String mobile = loginVo.getMobile();
         String password = loginVo.getPassword();
         // 可以用@Valid来进行参数校验
@@ -66,6 +70,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             // 用异常处理器来处理异常，可以直接抛异常
             throw new GlobalException(RespBeanEnum.LOGIN_ERROR);
         }
+        // 生成cookie
+        String ticket = UUIDUtil.uuid();
+        request.getSession().setAttribute(ticket, user);
+        CookieUtil.setCookie(request, response, "userTicket", ticket);
         return RespBean.success(RespBeanEnum.SUCCESS);
     }
 }
