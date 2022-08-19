@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2022-08-19
  */
 @RestController
-@RequestMapping("/seckill/seckill-order")
+@RequestMapping("/seckill/seckillOrder")
 public class SeckillOrderController {
 
 }
