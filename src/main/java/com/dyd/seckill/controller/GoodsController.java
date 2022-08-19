@@ -13,16 +13,24 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/goods")
 public class GoodsController {
 
+//    // 原本的方式
+//    @RequestMapping("/toList")
+//    public String toList(HttpSession session, Model model, @CookieValue("userTicket") String ticket){
+//        if(StringUtils.isEmpty(ticket)){
+//            // 说明没有登陆过
+//            return "login";
+//        }
+//        User user = (User) session.getAttribute(ticket);
+//        if(user == null){
+//            return "login";
+//        }
+//        model.addAttribute("user", user);
+//        return "goodsList";
+//    }
+
+    // 改进之后，在WebMvcConfigurer中加入ArgumentResolvers
     @RequestMapping("/toList")
-    public String toList(HttpSession session, Model model, @CookieValue("userTicket") String ticket){
-        if(StringUtils.isEmpty(ticket)){
-            // 说明没有登陆过
-            return "login";
-        }
-        User user = (User) session.getAttribute(ticket);
-        if(user == null){
-            return "login";
-        }
+    public String toList(Model model, User user){
         model.addAttribute("user", user);
         return "goodsList";
     }
