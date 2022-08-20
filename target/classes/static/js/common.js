@@ -26,7 +26,7 @@ Date.prototype.format = function (format) {
 	for (var i in args) {
 		var n = args[i];
 		if (new RegExp("(" + i + ")").test(format))
-			format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? n : ("00" + n).substr(("" + n).length));
+			format = format.replace(RegExp.$1womeix, RegExp.$1.length == 1 ? n : ("00" + n).substr(("" + n).length));
 	}
 	return format;
 };
