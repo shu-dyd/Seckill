@@ -74,6 +74,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String ticket = UUIDUtil.uuid();
         request.getSession().setAttribute(ticket, user);
         CookieUtil.setCookie(request, response, "userTicket", ticket);
-        return RespBean.success(RespBeanEnum.SUCCESS);
+        return RespBean.success(ticket);
     }
 }
