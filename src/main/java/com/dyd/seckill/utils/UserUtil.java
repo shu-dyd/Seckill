@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -42,10 +43,11 @@ public class UserUtil {
         ArrayList<User> users = new ArrayList<>(count);
         for(int i = 0; i < count; i++){
             User user = new User();
-            user.setId(1380000000L+i);
+            user.setId(13800000000L+i);
             user.setNickname("user"+i);
-            user.setSalt("1a2b3c");
+            user.setSalt("1a2b3c4d");
             user.setPassword(MD5Utils.inputPassToDBPass("123123", user.getSalt()));
+            user.setLoginCount(0);
             users.add(user);
         }
 
@@ -56,7 +58,8 @@ public class UserUtil {
             User user = users.get(i);
             ps.setInt(1, user.getLoginCount());
             ps.setString(2, user.getNickname());
-            ps.setTimestamp(3, Timestamp.valueOf(user.getRegisterDate()));
+//            ps.setTimestamp(3, Timestamp.valueOf(user.getRegisterDate()));
+            ps.setTimestamp(3, null);
             ps.setString(4, user.getSalt());
             ps.setString(5, user.getPassword());
             ps.setLong(6, user.getId());
@@ -68,7 +71,7 @@ public class UserUtil {
 
         // 所有生成的用户去登录，产生cookie，会在redis中进行保存
         // 也保存在本地的txt中，用于压力测试
-        String urlString = "http://106.13.32.36:8080/login/toLogin";
+        String urlString = "http://localhost:8080/login/doLogin";
         File file = new File("D:\\exer\\xiangmu\\config.txt");
         if(file.exists()){
             file.delete();
@@ -98,9 +101,17 @@ public class UserUtil {
             String response = new String(bout.toByteArray());
             ObjectMapper mapper = new ObjectMapper();
             RespBean respBean = mapper.readValue(response, RespBean.class);
-
+            String userTicket = (String) respBean.getObj();
+            String row = user.getId() + "," +userTicket;
+            raf.seek(raf.length());
+            raf.write(row.getBytes());
+            raf.write("\r\n".getBytes());
         }
-
-
+        raf.close();
     }
+
+    public static void main(String[] args) throws Exception {
+        createUser(2000);
+    }
+
 }

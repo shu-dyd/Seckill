@@ -27,6 +27,14 @@ public class SecKillController {
 
     @RequestMapping("/doSeckill")
     public String doSeckill(Model model, User user, Long goodsId){
+        System.out.println("^^^^^^^^^^^^^^^^^^");
+        if(user==null){
+            System.out.println("nullnullnull");
+        }else{
+            System.out.println(user.getId());
+        }
+
+        System.out.println("~~~~~~~~~~~~~~~~~~");
         if(user==null){
             return "login";
         }
