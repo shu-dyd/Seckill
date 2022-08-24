@@ -24,8 +24,15 @@ spring:
 #        # 最小空闲连接
 #        min-idle: 2
     password: "000415"
-    host: 47.97.33.184
-    port: 6385
+#    host: 47.97.33.184
+#    port: 6385
+    cluster:
+      nodes:
+        - 47.97.33.184:6379
+        - 47.97.33.184:6380
+        - 47.97.33.184:6381
+
+
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

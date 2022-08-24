@@ -25,11 +25,20 @@ public class SecKillController {
     @Autowired
     private IOrderService orderService;
 
+    /**
+     * windows优化前QPS：94.2
+     *      redis集群QPS：137.3
+     * linux优化前QPS：71.3
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
     @RequestMapping("/doSeckill")
     public String doSeckill(Model model, User user, Long goodsId){
         System.out.println("^^^^^^^^^^^^^^^^^^");
         if(user==null){
-            System.out.println("nullnullnull");
+            System.out.println("null");
         }else{
             System.out.println(user.getId());
         }
