@@ -87,8 +87,8 @@ public class GoodsController {
         DetailVo detailVo = new DetailVo();
         detailVo.setUser(user);
         detailVo.setGoodsVo(goodsVo);
-        detailVo.setSeckillStatus(remainSeconds);
-        detailVo.setRemainSeconds(secKillStatus);
+        detailVo.setSeckillStatus(secKillStatus);
+        detailVo.setRemainSeconds(remainSeconds);
         return RespBean.success(detailVo);
     }
 
