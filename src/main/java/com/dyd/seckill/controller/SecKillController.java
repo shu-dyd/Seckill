@@ -27,7 +27,8 @@ public class SecKillController {
 
     /**
      * windows优化前QPS：94.2
-     *      redis集群QPS：137.3
+     *      redis集群QPS：203.9
+     *      加入缓存QPS：165.6
      * linux优化前QPS：71.3
      * @param model
      * @param user
