@@ -26,7 +26,7 @@
     <table class="table" id="goods">
         <tr>
             <td>商品名称</td>
-            <td colspan="3" id="${goodsName}"></td>
+            <td colspan="3" id="goodsName"></td>
         </tr>
         <tr>
             <td>商品图片</td>
@@ -40,10 +40,10 @@
                 <span id="seckillTip"></span>
             </td>
             <td>
-                <form id="secKillForm" method="post" action="/seckill/doSeckill">
+                <!-- 秒杀页面静态化 -->
+                <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="doSeckill()">立即秒杀
                     <input type="hidden" name="goodsId" id="goodsId">
-                    <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
-                </form>
+                </button>
             </td>
         </tr>
         <tr>
@@ -65,6 +65,26 @@
     $(function () {
         getDetails();
     });
+
+    function doSeckill() {
+        $.ajax({
+            url:'/seckill/doSeckill',
+            type:'POST',
+            data:{
+                goodsId:$("#goodsId").val()
+            },
+            success:function(data){
+                if (data.code==200){
+                    window.location.href="/orderDetail.htm?orderId="+data.obj.id;
+                }else{
+                    layer.msg("客户端请求错误");
+                }
+            },
+            error:function(){
+                layer.msg("客户端请求错误");
+            }
+        })
+    };
 
     function countDown() {
         var remainSeconds = $("#remainSeconds").val();
@@ -90,6 +110,7 @@
         }
     };
 
+<!--    静态页面通过ajax调用接口获取数据-->
     function getDetails(){
         var goodsId = g_getQueryString("goodsId");
         $.ajax({
@@ -106,7 +127,7 @@
                 layer.msg("客户端请求出错");
             }
         });
-    }
+    };
 
     function render(detail){
         var user = detail.user;
