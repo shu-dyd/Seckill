@@ -75,7 +75,9 @@
             },
             success:function(data){
                 if (data.code==200){
-                    window.location.href="/orderDetail.htm?orderId="+data.obj.id;
+                    //window.location.href="/orderDetail.htm?orderId="+data.obj.id;
+                    //客户端轮询秒杀结果，因为使用了消息队列来处理秒杀任务
+                    getResult($("#goodsId").val());
                 }else{
                     layer.msg("客户端请求错误");
                 }
@@ -85,6 +87,43 @@
             }
         })
     };
+
+    function getResult(goodsId){
+        g_showLoading();
+        $.ajax({
+            url:"/seckill/result",
+            type:"GET",
+            data:{
+                goodsId:goodsId,
+            },
+            success:function(data){
+                if (data.code==200){
+                    var result = data.obj;
+                    if(result < 0){
+                        layer.msg("对不起，秒杀失败");
+                    }else if (result==0){
+                        setTimeout(function(){
+                            getResult(goodsId);
+                        },50);
+                    }else{
+                        layer.confirm("恭喜你，秒杀成功！查看订单？",{btn:["确定","取消"]},
+                        function(){
+                            window.location.href="/orderDetail.htm?orderId="+result;
+                        },
+                        function(){
+                            layer.close();
+                        }
+                        );
+                    }
+                }else{
+                    layer.msg("客户端请求错误");
+                }
+            },
+            error:function(){
+                layer.msg("客户端请求错误");
+            }
+        })
+    }
 
     function countDown() {
         var remainSeconds = $("#remainSeconds").val();

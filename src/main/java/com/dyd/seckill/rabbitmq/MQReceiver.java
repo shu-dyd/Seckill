@@ -26,7 +26,7 @@ public class MQReceiver {
     @Autowired
     private IOrderService orderService;
 
-    @RabbitListener(queues = "secklillQueue")
+    @RabbitListener(queues = "seckillQueue")
     public void receive(String message){
         log.info("接收到的消息："+message);
         SeckillMessage seckillMessage = JsonUtil.jsonStr2Object(message, SeckillMessage.class);

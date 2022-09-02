@@ -19,6 +19,7 @@ import com.dyd.seckill.vo.OrderDetailVo;
 import com.dyd.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +51,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Transactional
     @Override
     public Order seckill(User user, GoodsVo goodsVo) {
-
+        ValueOperations valueOperations = redisTemplate.opsForValue();
         SeckillGoods seckillGoods = seckillGoodsService.getOne(new QueryWrapper<SeckillGoods>().eq("goods_id", goodsVo.getId()));
         seckillGoods.setStockCount(seckillGoods.getStockCount()-1);
 
@@ -59,8 +60,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 行级锁
         boolean result = seckillGoodsService.update(new UpdateWrapper<SeckillGoods>().setSql(
                 "stock_count = " + "stock_count-1").eq("goods_id", goodsVo.getId()).gt("stock_count", 0));
-        if(!result){
-            // 如果没有去库存减一，就不执行去创建订单了
+        if(seckillGoods.getStockCount()<1){
+            valueOperations.set("isStockEmpty:"+goodsVo.getId(),"0");
             return null;
         }
 
@@ -88,7 +89,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         //将成功秒杀的用户和商品信息，秒杀订单存放在redis中。
         // 后续查询是否重复抢购的时候就不用再去mysql中查询了。
-        redisTemplate.opsForValue().set("order:"+user.getId()+":"+goodsVo.getId(), seckillOrder);
+        valueOperations.set("order:"+user.getId()+":"+goodsVo.getId(), seckillOrder);
 
         return order;
     }

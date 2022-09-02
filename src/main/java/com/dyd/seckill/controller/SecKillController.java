@@ -103,6 +103,23 @@ public class SecKillController implements InitializingBean {
     }
 
     /**
+     * 获取秒杀结果
+     * orderId:成功；-1：秒杀失败；0：排队中
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
+    @ResponseBody
+    public RespBean getResult(User user, Long goodsId){
+        if(user==null){
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        Long orderId = seckillOrderService.getResult(user, goodsId);
+        return RespBean.success(orderId);
+    }
+
+    /**
      * 3.0 用于redis预减库存时，提前加载库存信息到redis。
      * 这个方法应该很熟悉，之前看dubbo源码时也有所接触。在bean的生命周期中，
      * 实例化，生成对象，属性填充后会进行该方法的执行
