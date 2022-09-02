@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/seckill")
@@ -40,6 +42,8 @@ public class SecKillController implements InitializingBean {
     private RedisTemplate redisTemplate;
     @Autowired
     private MQSender mqSender;
+    // 通过内存进行标记，当redis预减库存已经为0了，就不要在去访问了
+    private Map<Long, Boolean> EmptyStockMap = new HashMap<>();
 
     /**
      * windows优化前QPS：94.2
@@ -78,9 +82,15 @@ public class SecKillController implements InitializingBean {
             return RespBean.error(RespBeanEnum.REPEATE_ERROR);
         }
 
+        // 如果内存标记已经没库存了，就不要再去访问redis了
+        if(EmptyStockMap.get(goodsId)){
+            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
+        }
+
         // 利用提前加载到redis中的商品库存信息来进行判断
         Long stock = valueOperations.decrement("seckillGoods:" + goodsId);
         if(stock < 0){
+            EmptyStockMap.put(goodsId, true);
             // 将-1的库存数量恢复回0
             valueOperations.increment("seckillGoods:" + goodsId);
             return RespBean.error(RespBeanEnum.EMPTY_STOCK);
@@ -107,6 +117,7 @@ public class SecKillController implements InitializingBean {
         }
         list.forEach(goodsVo -> {
             redisTemplate.opsForValue().set("seckillGoods:"+goodsVo.getId(),goodsVo.getStockCount());
+            EmptyStockMap.put(goodsVo.getId(), false);
         });
 
     }
