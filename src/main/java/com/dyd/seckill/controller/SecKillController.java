@@ -20,6 +20,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,28 +51,37 @@ public class SecKillController implements InitializingBean {
      *      redis集群QPS：203.9
      *      加入缓存QPS：165.6
      *      加入静态页面缓存，加入redis缓存秒杀订单QPS：469.2
+     *      加入RabbitMQ,QPS:257.8
      * linux优化前QPS：71.3
-     * @param model
      * @param user
      * @param goodsId
      * @return
      */
     // 3.0版本，redis预减库存。不用频繁访问mysql查库存
-    @RequestMapping(value = "/doSeckill", method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/doSeckill", method = RequestMethod.POST)
     @ResponseBody
-    public RespBean doSeckill(Model model, User user, Long goodsId){
+    public RespBean doSeckill(@PathVariable String path, User user, Long goodsId){
         System.out.println("^^^^^^^^^^^^^^^^^^");
         if(user==null){
             System.out.println("null");
         }else{
             System.out.println(user.getId());
         }
-
         System.out.println("~~~~~~~~~~~~~~~~~~");
+
         if(user==null){
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
         ValueOperations valueOperations = redisTemplate.opsForValue();
+
+        // 之前根据用户和商品id获取随机的路径的时候,已经将其保存在了redis中
+        // 在这里做一个校验
+        boolean check = orderService.checkPath(user, goodsId, path);
+        if(!check){
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
+        }
+
+
         // 当然依旧保留2.0版本中的通过reids来保存秒杀订单的策略。
         // 这样查询用户是否秒杀的话不用访问mysql。
         // 判断是否重复抢购，并不完全安全，如果一个用户同时多条请求过来，还是有可能会进入到秒杀的服务中。
@@ -79,6 +89,7 @@ public class SecKillController implements InitializingBean {
         // 在秒杀的seckill()中，除了到mysql中添加秒杀成功记录，还可以在redis中添加秒杀成功记录，便于查询是否已经秒杀
         SeckillOrder seckillOrder = (SeckillOrder) redisTemplate.opsForValue().get("order:" + user.getId() + ":" + goodsId);
         if(seckillOrder != null){
+            System.out.println("已经存在秒杀订单");
             return RespBean.error(RespBeanEnum.REPEATE_ERROR);
         }
 
@@ -118,6 +129,23 @@ public class SecKillController implements InitializingBean {
         Long orderId = seckillOrderService.getResult(user, goodsId);
         return RespBean.success(orderId);
     }
+
+    /**
+     * 获取秒杀地址
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/path", method = RequestMethod.GET)
+    @ResponseBody
+    public RespBean getPath(User user, Long goodsId){
+        if(user==null){
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        String str = orderService.createPath(user, goodsId);
+        return RespBean.success(str);
+    }
+
 
     /**
      * 3.0 用于redis预减库存时，提前加载库存信息到redis。

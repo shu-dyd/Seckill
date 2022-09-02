@@ -2,7 +2,6 @@ package com.dyd.seckill.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dyd.seckill.exception.GlobalException;
 import com.dyd.seckill.mapper.OrderMapper;
@@ -14,9 +13,12 @@ import com.dyd.seckill.service.IGoodsService;
 import com.dyd.seckill.service.IOrderService;
 import com.dyd.seckill.service.ISeckillGoodsService;
 import com.dyd.seckill.service.ISeckillOrderService;
+import com.dyd.seckill.utils.MD5Utils;
+import com.dyd.seckill.utils.UUIDUtil;
 import com.dyd.seckill.vo.GoodsVo;
 import com.dyd.seckill.vo.OrderDetailVo;
 import com.dyd.seckill.vo.RespBeanEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -106,5 +109,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         detail.setOrder(order);
         detail.setGoodsVo(goodsVo);
         return detail;
+    }
+
+    // 根据用户和商品id随机获取秒杀地址，存入redis
+    @Override
+    public String createPath(User user, Long goodsId) {
+        String str = MD5Utils.md5(UUIDUtil.uuid()+"123456");
+        redisTemplate.opsForValue().set("seckillPath:"+user.getId()+":"+goodsId,str,60, TimeUnit.SECONDS);
+        return str;
+    }
+
+    @Override
+    public boolean checkPath(User user, Long goodsId, String path) {
+        if(user == null||goodsId<0|| StringUtils.isEmpty(path)){
+            return false;
+        }
+        String redisPath = (String) redisTemplate.opsForValue().get("seckillPath:" + user.getId() + ":" + goodsId);
+
+        return path.equals(redisPath);
     }
 }
