@@ -97,6 +97,39 @@ spring:
       #abanded连接时输出错误日志，方便出现连接泄露时可以通过错误日志定位忘记关闭连接的位置
       log-abandoned: true
 
+  rabbitmq:
+    host: 121.5.90.217
+    username: guest
+    password: guest
+    #虚拟主机
+    virtual-host: /
+    port: 5672
+    listener:
+      simple:
+        #消费者最小数量
+        concurrency: 10
+        #消费者最大数量
+        max-concurrency: 10
+        #限制消费者每次只处理条消息，处理完再继续下一条消息
+        prefetch: 1
+        #启动的时候是否默认启动容器
+        auto-startup: true
+        #被拒绝时重新进入队列
+        default-requeue-rejected: true
+      direct:
+        retry:
+          #发布重试，默认false
+          enabled: true
+          #重试时间
+          initial-interval: 1000ms
+          #重试最大次数
+          max-attempts: 3
+          #重试最大间隔时间
+          max-interval: 10000ms
+          #重试的间隔乘数。比如2.0，第一次10s，第二次就20s，第三次就40s
+          multiplier: 1
+
+
 
 
 
