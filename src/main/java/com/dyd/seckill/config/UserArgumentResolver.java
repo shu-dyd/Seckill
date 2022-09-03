@@ -30,14 +30,8 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
-        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        String ticket = CookieUtil.getCookieValue(request, "userTicket");
-        if(StringUtils.isEmpty(ticket)){
-            return null;
-        }
-
-        return userService.getUserByCookie(ticket, request, response);
-
+        // 在限流操作中，拦截器已经获取了user存放在threadlocal中，这里直接调用就行
+        User user = UserContext.getUser();
+        return user;
     }
 }

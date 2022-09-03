@@ -1,6 +1,7 @@
 package com.dyd.seckill.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.dyd.seckill.config.AccessLimit;
 import com.dyd.seckill.exception.GlobalException;
 import com.dyd.seckill.pojo.Order;
 import com.dyd.seckill.pojo.SeckillMessage;
@@ -143,6 +144,7 @@ public class SecKillController implements InitializingBean {
      * @param goodsId
      * @return
      */
+    @AccessLimit(second=5, maxCount=5, needLogin=true)
     @RequestMapping(value = "/path", method = RequestMethod.GET)
     @ResponseBody
     public RespBean getPath(User user, Long goodsId, String captcha){
